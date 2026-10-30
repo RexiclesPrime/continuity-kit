@@ -1,6 +1,8 @@
-# Continuity Packet Builder — Start Here
+# Continuity Kit
 
-A self-hostable, browser-based tool that guides you through creating a Continuity Packet for incapacity or death. Designed for technical people who have not yet done formal planning.
+![Continuity Kit](logo.png)
+
+A practical, self-hostable kit for creating a Continuity Packet so the people you trust can act when you cannot.
 
 ## Quick Start
 
