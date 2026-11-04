@@ -406,7 +406,7 @@
 
   <script>
     const form = document.getElementById('packet-form');
-    const STORAGE_KEY = 'continuity-packet-builder-v6';
+    const STORAGE_KEY = 'continuity-packet-builder-v7';
     const credContainer = document.getElementById('cred-container');
     const contactContainer = document.getElementById('contact-container');
     const finContainer = document.getElementById('fin-container');
@@ -437,7 +437,9 @@
     function addLetterRow(data = {}) {
       const row = document.createElement('div');
       row.className = 'letter-row';
-      row.innerHTML = `<input class="letter-recipient" placeholder="Recipient Name" value="${data.recipient||''}"><input class="letter-relationship" placeholder="Relationship" value="${data.relationship||''}"><input class="letter-when" placeholder="When to deliver" value="${data.when||''}"><button type="button" class="remove">×</button><textarea class="letter-message" placeholder="Your message…" style="min-height:80px; margin-top:0.5rem;">${data.message||''}</textarea>`;
+      row.innerHTML = `<input class="letter-recipient" placeholder="Recipient Name" value="${data.recipient||''}"><input class="letter-relationship" placeholder="Relationship" value="${data.relationship||''}"><input class="letter-when" placeholder="When to deliver" value="${data.when||''}"><button type="button" class="remove">×</button>
+      <input class="letter-physical" placeholder="Physical letter location (if handwritten)" value="${data.physical||''}" style="grid-column:1/-2; margin-top:0.5rem;">
+      <textarea class="letter-message" placeholder="Digital message (optional if you have a handwritten letter)…" style="min-height:80px; margin-top:0.5rem;">${data.message||''}</textarea>`;
       row.querySelector('.remove').onclick = () => { row.remove(); updateStatusDots(); };
       letterContainer.appendChild(row);
     }
@@ -453,7 +455,7 @@
     function collectCreds() { return Array.from(credContainer.querySelectorAll('.cred-row')).map(r => ({group:r.querySelector('.cred-group').value, title:r.querySelector('.cred-title').value, username:r.querySelector('.cred-username').value, password:r.querySelector('.cred-password').value, url:r.querySelector('.cred-url').value, notes:r.querySelector('.cred-notes').value})).filter(c => c.title || c.username); }
     function collectContacts() { return Array.from(contactContainer.querySelectorAll('.contact-row')).map(r => ({name:r.querySelector('.contact-name').value, relationship:r.querySelector('.contact-relationship').value, phone:r.querySelector('.contact-phone').value, notes:r.querySelector('.contact-notes').value})).filter(c => c.name); }
     function collectFin() { return Array.from(finContainer.querySelectorAll('.fin-row')).map(r => ({type:r.querySelector('.fin-type').value, institution:r.querySelector('.fin-institution').value, account:r.querySelector('.fin-account').value, notes:r.querySelector('.fin-notes').value})).filter(f => f.type || f.institution); }
-    function collectLetters() { return Array.from(letterContainer.querySelectorAll('.letter-row')).map(r => ({recipient:r.querySelector('.letter-recipient').value, relationship:r.querySelector('.letter-relationship').value, when:r.querySelector('.letter-when').value, physical:r.querySelector('.letter-physical').value, message:r.querySelector('.letter-message').value})).filter(l => l.recipient || l.message || l.physical); }
+    function collectLetters() { return Array.from(letterContainer.querySelectorAll('.letter-row')).map(r => ({recipient:r.querySelector('.letter-recipient')?.value || '', relationship:r.querySelector('.letter-relationship')?.value || '', when:r.querySelector('.letter-when')?.value || '', physical:r.querySelector('.letter-physical')?.value || '', message:r.querySelector('.letter-message')?.value || ''})).filter(l => l.recipient || l.message || l.physical); }
 
     function getFormData() {
       const data = {};
@@ -465,7 +467,16 @@
       return data;
     }
 
-    function saveProgress() { localStorage.setItem(STORAGE_KEY, JSON.stringify(getFormData())); updateStatusDots(); alert('Progress saved in this browser.'); }
+    function saveProgress() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(getFormData()));
+        updateStatusDots();
+        alert('Progress saved in this browser.');
+      } catch (e) {
+        alert('Save failed: ' + e.message);
+        console.error(e);
+      }
+    }
 
     function loadFromData(data) {
       Object.keys(data).forEach(name => {
@@ -635,12 +646,17 @@
     document.getElementById('btn-generate').onclick = generatePacket;
     document.getElementById('btn-save').onclick = saveProgress;
     document.getElementById('btn-export-json').onclick = () => {
-      const data = getFormData();
-      const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `continuity-progress-${(data.ownerName||'packet').replace(/\s+/g,'-')}.json`;
-      a.click();
+      try {
+        const data = getFormData();
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `continuity-progress-${(data.ownerName||'packet').replace(/\s+/g,'-')}.json`;
+        a.click();
+      } catch (e) {
+        alert('Export failed: ' + e.message);
+        console.error(e);
+      }
     };
     document.getElementById('btn-import-json').onclick = () => document.getElementById('import-file').click();
     document.getElementById('import-file').onchange = e => {
