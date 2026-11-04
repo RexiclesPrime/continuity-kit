@@ -109,8 +109,8 @@
             <p>Good enough for a first pass: put your legal name and today’s date.</p>
           </details>
           <label>Full Legal Name</label><input type="text" name="ownerName" placeholder="[Your Full Legal Name]">
-          <div class="field-row"><div><label>Packet Version</label><input type="text" name="packetVersion" value="0.1"></div><div><label>Date of This Version</label><input type="text" name="versionDate" placeholder="YYYY-MM-DD"></div></div>
-          <label>Next Scheduled Review</label><input type="text" name="nextReview" placeholder="YYYY-MM-DD">
+          <div class="field-row"><div><label>Packet Version</label><input type="text" name="packetVersion" value="0.1"></div><div><label>Date of This Version</label><input type="date" name="versionDate"></div></div>
+          <label>Next Scheduled Review</label><input type="date" name="nextReview">
         </section>
 
         <section class="section" id="team">
@@ -375,7 +375,7 @@
             <option>Annually + after major life changes</option>
           </select>
           <label>Next Review Date (put this on your calendar)</label>
-          <input type="text" name="nextReviewAction" placeholder="YYYY-MM-DD">
+          <input type="date" name="nextReviewAction">
           <label>Notes on Conversations to Have</label>
           <textarea name="whatNextNotes" placeholder="e.g., Call Sarah (Digital Agent) this weekend. Schedule attorney review in November. Show packet to spouse."></textarea>
         </section>
